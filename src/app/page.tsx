@@ -164,222 +164,39 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#080b0a] text-white">
-      <header className="flex h-16 items-center justify-between border-b border-white/10 px-6">
-        <div className="flex items-center gap-3">
-          <div className="text-xl font-bold tracking-tight">Flow</div>
+      {/* Mobile blocker */}
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center lg:hidden">
+        <div className="text-xl font-bold tracking-tight">Flow</div>
+        <p className="text-sm text-white/60">
+          This POC is built for desktop only. Please view on a larger screen.
+        </p>
+      </div>
 
-          <span className="rounded bg-emerald-400/10 px-2 py-1 text-xs text-emerald-400">
-            Trade
-          </span>
-        </div>
+      {/* Actual app, hidden on mobile */}
+      <div className="hidden lg:block">
+        <header className="flex h-16 items-center justify-between border-b border-white/10 px-6">
+          <div className="flex items-center gap-3">
+            <div className="text-xl font-bold tracking-tight">Flow</div>
 
-        <div className="flex items-center gap-3">
-          <div className="rounded-md border border-white/10 px-3 py-2 text-xs text-white/60">
-            Base Sepolia
+            <span className="rounded bg-emerald-400/10 px-2 py-1 text-xs text-emerald-400">
+              Trade
+            </span>
           </div>
 
-          {isConnected ? (
-            <button
-              onClick={() => disconnect()}
-              className="rounded-md bg-emerald-400 px-4 py-2 text-sm font-semibold text-black"
-            >
-              {address?.slice(0, 6)}...
-              {address?.slice(-4)}
-            </button>
-          ) : (
-            <button
-              onClick={() =>
-                connect({
-                  connector: injected(),
-                  chainId: baseSepolia.id,
-                })
-              }
-              disabled={isConnecting}
-              className="rounded-md bg-emerald-400 px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
-            >
-              {isConnecting ? "Connecting..." : "Connect Wallet"}
-            </button>
-          )}
-        </div>
-      </header>
-
-      <div className="grid min-h-[calc(100vh-4rem)] grid-cols-[240px_1fr_360px]">
-        <aside className="border-r border-white/10 p-5">
-          <p className="mb-4 text-xs uppercase tracking-wider text-white/40">
-            Markets
-          </p>
-
-          <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/5 p-3">
-            <div className="flex justify-between">
-              <span className="text-sm">ETH/WETH</span>
-
-              <span className="text-xs text-emerald-400">SPOT</span>
+          <div className="flex items-center gap-3">
+            <div className="rounded-md border border-white/10 px-3 py-2 text-xs text-white/60">
+              Base Sepolia
             </div>
 
-            <p className="mt-2 text-xs text-white/40">Base Sepolia</p>
-          </div>
-        </aside>
-
-        <section className="p-6">
-          <div className="mb-5">
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl font-semibold">ETH/WETH</h1>
-
-              <span className="rounded bg-emerald-400/10 px-2 py-1 text-xs text-emerald-400">
-                SPOT
-              </span>
-            </div>
-
-            <p className="mt-1 text-xs text-white/40">Onchain execution POC</p>
-          </div>
-
-          <div className="flex h-155 items-center justify-center rounded-xl border border-white/10 bg-[#0b0f0d]">
-            <div className="text-center">
-              <p className="text-sm text-white/30">ETH/WETH Market Chart</p>
-
-              <p className="mt-2 text-xs text-white/20">
-                Static visual placeholder
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <aside className="border-l border-white/10 p-5">
-          <div className="mb-6 flex border-b border-white/10">
-            <button className="border-b-2 border-emerald-400 px-4 pb-3 text-sm">
-              Swap
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <div className="mb-2 flex justify-between text-xs text-white/40">
-                <span>You Pay</span>
-
-                <span>
-                  Balance:{" "}
-                  {balance
-                    ? Number(
-                        formatUnits(balance.value, balance.decimals),
-                      ).toFixed(4)
-                    : "—"}{" "}
-                  ETH
-                </span>
-              </div>
-
-              <div className="rounded-lg border border-white/10 bg-white/3 p-4">
-                <div className="flex items-center justify-between">
-                  <input
-                    value={amount}
-                    onChange={(event) => setAmount(event.target.value)}
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    className="w-full bg-transparent text-2xl outline-none"
-                  />
-
-                  <span className="ml-3 rounded bg-white/10 px-2 py-1 text-sm">
-                    ETH
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-center">
-              <div className="rounded-full border border-white/10 bg-[#101512] px-3 py-2 text-xs text-white/50">
-                ↓
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-2 flex justify-between text-xs text-white/40">
-                <span>You Receive</span>
-
-                <span>Balance: —</span>
-              </div>
-
-              <div className="rounded-lg border border-white/10 bg-white/3 p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl">
-                    {isQuoting
-                      ? "..."
-                      : outputAmount
-                        ? outputAmount.toFixed(4)
-                        : "0.00"}
-                  </span>
-
-                  <span className="ml-3 rounded bg-white/10 px-2 py-1 text-sm">
-                    WETH
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={getQuote}
-              disabled={!isConnected || wrongNetwork || isQuoting}
-              className="w-full rounded-lg border border-white/10 py-3 text-sm text-white/70 disabled:opacity-30"
-            >
-              {isQuoting ? "Fetching Quote..." : "Refresh Quote"}
-            </button>
-
-            {quote && (
-              <div className="space-y-3 rounded-lg border border-white/10 bg-white/2 p-4 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-white/40">Rate</span>
-
-                  <span>
-                    1 ETH ≈{" "}
-                    {outputAmount ? outputAmount / Number(amount || 1) : "—"}{" "}
-                    WETH
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-white/40">Slippage</span>
-
-                  <span>0.50%</span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-white/40">Routing</span>
-
-                  <span>{quote.routing ?? "—"}</span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-white/40">Gas estimate</span>
-
-                  <span>${quote.quote?.classicGasUseEstimateUSD ?? "—"}</span>
-                </div>
-              </div>
-            )}
-
-            {quoteError && (
-              <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-400">
-                {quoteError}
-              </div>
-            )}
-
-            {wrongNetwork && (
-              <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-3 text-xs text-yellow-400">
-                Switch your wallet to Base Sepolia.
-              </div>
-            )}
-
-            {sendError && (
-              <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-400">
-                {sendError.message}
-              </div>
-            )}
-
-            {swapError && (
-              <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-400">
-                {swapError}
-              </div>
-            )}
-
-            {!isConnected ? (
+            {isConnected ? (
+              <button
+                onClick={() => disconnect()}
+                className="rounded-md bg-emerald-400 px-4 py-2 text-sm font-semibold text-black"
+              >
+                {address?.slice(0, 6)}...
+                {address?.slice(-4)}
+              </button>
+            ) : (
               <button
                 onClick={() =>
                   connect({
@@ -387,49 +204,245 @@ export default function Home() {
                     chainId: baseSepolia.id,
                   })
                 }
-                className="w-full rounded-lg bg-emerald-400 py-3 text-sm font-semibold text-black"
+                disabled={isConnecting}
+                className="rounded-md bg-emerald-400 px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
               >
-                Connect Wallet to Trade
-              </button>
-            ) : (
-              <button
-                onClick={executeSwap}
-                disabled={busy || !quote || wrongNetwork || isConfirmed}
-                className="w-full rounded-lg bg-emerald-400 py-3 text-sm font-semibold text-black disabled:opacity-40"
-              >
-                {isBuildingSwap
-                  ? "Preparing Transaction..."
-                  : isSending
-                    ? "Waiting for Signature..."
-                    : isConfirming
-                      ? "Confirming Onchain..."
-                      : isConfirmed
-                        ? "Trade Complete"
-                        : "Review Trade"}
-              </button>
-            )}
-
-            {txHash && (
-              <a
-                href={`${SEPOLIA_EXPLORER}/tx/${txHash}`}
-                target="_blank"
-                rel="noreferrer"
-                className="block text-center text-xs text-emerald-400 hover:underline"
-              >
-                View Transaction ↗
-              </a>
-            )}
-
-            {isConfirmed && (
-              <button
-                onClick={() => setQuote(null)}
-                className="w-full rounded-lg border border-white/10 py-2 text-xs text-white/60"
-              >
-                Start New Trade
+                {isConnecting ? "Connecting..." : "Connect Wallet"}
               </button>
             )}
           </div>
-        </aside>
+        </header>
+
+        <div className="grid min-h-[calc(100vh-4rem)] grid-cols-[240px_1fr_360px]">
+          <aside className="border-r border-white/10 p-5">
+            <p className="mb-4 text-xs uppercase tracking-wider text-white/40">
+              Markets
+            </p>
+
+            <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/5 p-3">
+              <div className="flex justify-between">
+                <span className="text-sm">ETH/WETH</span>
+
+                <span className="text-xs text-emerald-400">SPOT</span>
+              </div>
+
+              <p className="mt-2 text-xs text-white/40">Base Sepolia</p>
+            </div>
+          </aside>
+
+          <section className="p-6">
+            <div className="mb-5">
+              <div className="flex items-center gap-3">
+                <h1 className="text-xl font-semibold">ETH/WETH</h1>
+
+                <span className="rounded bg-emerald-400/10 px-2 py-1 text-xs text-emerald-400">
+                  SPOT
+                </span>
+              </div>
+
+              <p className="mt-1 text-xs text-white/40">
+                Onchain execution POC
+              </p>
+            </div>
+
+            <div className="flex h-155 items-center justify-center rounded-xl border border-white/10 bg-[#0b0f0d]">
+              <div className="text-center">
+                <p className="text-sm text-white/30">ETH/WETH Market Chart</p>
+
+                <p className="mt-2 text-xs text-white/20">
+                  Static visual placeholder
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <aside className="border-l border-white/10 p-5">
+            <div className="mb-6 flex border-b border-white/10">
+              <button className="border-b-2 border-emerald-400 px-4 pb-3 text-sm">
+                Swap
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <div className="mb-2 flex justify-between text-xs text-white/40">
+                  <span>You Pay</span>
+
+                  <span>
+                    Balance:{" "}
+                    {balance
+                      ? Number(
+                          formatUnits(balance.value, balance.decimals),
+                        ).toFixed(4)
+                      : "—"}{" "}
+                    ETH
+                  </span>
+                </div>
+
+                <div className="rounded-lg border border-white/10 bg-white/3 p-4">
+                  <div className="flex items-center justify-between">
+                    <input
+                      value={amount}
+                      onChange={(event) => setAmount(event.target.value)}
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      className="w-full bg-transparent text-2xl outline-none"
+                    />
+
+                    <span className="ml-3 rounded bg-white/10 px-2 py-1 text-sm">
+                      ETH
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-center">
+                <div className="rounded-full border border-white/10 bg-[#101512] px-3 py-2 text-xs text-white/50">
+                  ↓
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-2 flex justify-between text-xs text-white/40">
+                  <span>You Receive</span>
+
+                  <span>Balance: —</span>
+                </div>
+
+                <div className="rounded-lg border border-white/10 bg-white/3 p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl">
+                      {isQuoting
+                        ? "..."
+                        : outputAmount
+                          ? outputAmount.toFixed(4)
+                          : "0.00"}
+                    </span>
+
+                    <span className="ml-3 rounded bg-white/10 px-2 py-1 text-sm">
+                      WETH
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={getQuote}
+                disabled={!isConnected || wrongNetwork || isQuoting}
+                className="w-full rounded-lg border border-white/10 py-3 text-sm text-white/70 disabled:opacity-30"
+              >
+                {isQuoting ? "Fetching Quote..." : "Refresh Quote"}
+              </button>
+
+              {quote && (
+                <div className="space-y-3 rounded-lg border border-white/10 bg-white/2 p-4 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Rate</span>
+
+                    <span>
+                      1 ETH ≈{" "}
+                      {outputAmount ? outputAmount / Number(amount || 1) : "—"}{" "}
+                      WETH
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Slippage</span>
+
+                    <span>0.50%</span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Routing</span>
+
+                    <span>{quote.routing ?? "—"}</span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Gas estimate</span>
+
+                    <span>${quote.quote?.classicGasUseEstimateUSD ?? "—"}</span>
+                  </div>
+                </div>
+              )}
+
+              {quoteError && (
+                <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-400">
+                  {quoteError}
+                </div>
+              )}
+
+              {wrongNetwork && (
+                <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-3 text-xs text-yellow-400">
+                  Switch your wallet to Base Sepolia.
+                </div>
+              )}
+
+              {sendError && (
+                <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-400">
+                  {sendError.message}
+                </div>
+              )}
+
+              {swapError && (
+                <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-400">
+                  {swapError}
+                </div>
+              )}
+
+              {!isConnected ? (
+                <button
+                  onClick={() =>
+                    connect({
+                      connector: injected(),
+                      chainId: baseSepolia.id,
+                    })
+                  }
+                  className="w-full rounded-lg bg-emerald-400 py-3 text-sm font-semibold text-black"
+                >
+                  Connect Wallet to Trade
+                </button>
+              ) : (
+                <button
+                  onClick={executeSwap}
+                  disabled={busy || !quote || wrongNetwork || isConfirmed}
+                  className="w-full rounded-lg bg-emerald-400 py-3 text-sm font-semibold text-black disabled:opacity-40"
+                >
+                  {isBuildingSwap
+                    ? "Preparing Transaction..."
+                    : isSending
+                      ? "Waiting for Signature..."
+                      : isConfirming
+                        ? "Confirming Onchain..."
+                        : isConfirmed
+                          ? "Trade Complete"
+                          : "Review Trade"}
+                </button>
+              )}
+
+              {txHash && (
+                <a
+                  href={`${SEPOLIA_EXPLORER}/tx/${txHash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block text-center text-xs text-emerald-400 hover:underline"
+                >
+                  View Transaction ↗
+                </a>
+              )}
+
+              {isConfirmed && (
+                <button
+                  onClick={() => setQuote(null)}
+                  className="w-full rounded-lg border border-white/10 py-2 text-xs text-white/60"
+                >
+                  Start New Trade
+                </button>
+              )}
+            </div>
+          </aside>
+        </div>
       </div>
     </main>
   );
