@@ -14,7 +14,7 @@ import { injected } from "wagmi/connectors";
 import { baseSepolia } from "wagmi/chains";
 import { formatUnits, parseEther, type Hex } from "viem";
 
-import { BASE_SEPOLIA_EXPLORER, TOKENS } from "@/lib/constants";
+import { SEPOLIA_EXPLORER, TOKENS } from "@/lib/constants";
 
 type QuoteResponse = {
   quote?: {
@@ -56,7 +56,7 @@ export default function Home() {
       hash: txHash,
     });
 
-  const [amount, setAmount] = useState("0.1");
+  const [amount, setAmount] = useState("0.01");
   const [quote, setQuote] = useState<QuoteResponse | null>(null);
   const [isQuoting, setIsQuoting] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
@@ -68,7 +68,7 @@ export default function Home() {
 
     if (!raw) return null;
 
-    return Number(formatUnits(BigInt(raw), TOKENS.USDC.decimals));
+    return Number(formatUnits(BigInt(raw), TOKENS.WETH.decimals));
   }, [quote]);
 
   async function getQuote() {
@@ -85,15 +85,14 @@ export default function Home() {
         },
         body: JSON.stringify({
           tokenIn: TOKENS.ETH.address,
-          tokenOut: TOKENS.USDC.address,
+          tokenOut: TOKENS.WETH.address,
           tokenInChainId: baseSepolia.id,
           tokenOutChainId: baseSepolia.id,
           type: "EXACT_INPUT",
           amount: parseEther(amount).toString(),
           swapper: address,
           slippageTolerance: 0.5,
-          routingPreference: "BEST_PRICE",
-          protocols: ["V3"],
+          protocols: ["V2", "V3"],
         }),
       });
 
@@ -212,7 +211,7 @@ export default function Home() {
 
           <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/5 p-3">
             <div className="flex justify-between">
-              <span className="text-sm">ETH/USDC</span>
+              <span className="text-sm">ETH/WETH</span>
 
               <span className="text-xs text-emerald-400">SPOT</span>
             </div>
@@ -224,7 +223,7 @@ export default function Home() {
         <section className="p-6">
           <div className="mb-5">
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-semibold">ETH/USDC</h1>
+              <h1 className="text-xl font-semibold">ETH/WETH</h1>
 
               <span className="rounded bg-emerald-400/10 px-2 py-1 text-xs text-emerald-400">
                 SPOT
@@ -234,9 +233,9 @@ export default function Home() {
             <p className="mt-1 text-xs text-white/40">Onchain execution POC</p>
           </div>
 
-          <div className="flex h-[620px] items-center justify-center rounded-xl border border-white/10 bg-[#0b0f0d]">
+          <div className="flex h-155 items-center justify-center rounded-xl border border-white/10 bg-[#0b0f0d]">
             <div className="text-center">
-              <p className="text-sm text-white/30">ETH/USDC Market Chart</p>
+              <p className="text-sm text-white/30">ETH/WETH Market Chart</p>
 
               <p className="mt-2 text-xs text-white/20">
                 Static visual placeholder
@@ -250,8 +249,6 @@ export default function Home() {
             <button className="border-b-2 border-emerald-400 px-4 pb-3 text-sm">
               Swap
             </button>
-
-            <button className="px-4 pb-3 text-sm text-white/40">Limit</button>
           </div>
 
           <div className="space-y-4">
@@ -270,7 +267,7 @@ export default function Home() {
                 </span>
               </div>
 
-              <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
+              <div className="rounded-lg border border-white/10 bg-white/3 p-4">
                 <div className="flex items-center justify-between">
                   <input
                     value={amount}
@@ -301,18 +298,18 @@ export default function Home() {
                 <span>Balance: —</span>
               </div>
 
-              <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
+              <div className="rounded-lg border border-white/10 bg-white/3 p-4">
                 <div className="flex items-center justify-between">
                   <span className="text-2xl">
                     {isQuoting
                       ? "..."
                       : outputAmount
-                        ? outputAmount.toFixed(2)
+                        ? outputAmount.toFixed(4)
                         : "0.00"}
                   </span>
 
                   <span className="ml-3 rounded bg-white/10 px-2 py-1 text-sm">
-                    USDC
+                    WETH
                   </span>
                 </div>
               </div>
@@ -327,14 +324,14 @@ export default function Home() {
             </button>
 
             {quote && (
-              <div className="space-y-3 rounded-lg border border-white/10 bg-white/[0.02] p-4 text-xs">
+              <div className="space-y-3 rounded-lg border border-white/10 bg-white/2 p-4 text-xs">
                 <div className="flex justify-between">
                   <span className="text-white/40">Rate</span>
 
                   <span>
                     1 ETH ≈{" "}
                     {outputAmount ? outputAmount / Number(amount || 1) : "—"}{" "}
-                    USDC
+                    WETH
                   </span>
                 </div>
 
@@ -397,7 +394,7 @@ export default function Home() {
             ) : (
               <button
                 onClick={executeSwap}
-                disabled={busy || !quote || wrongNetwork}
+                disabled={busy || !quote || wrongNetwork || isConfirmed}
                 className="w-full rounded-lg bg-emerald-400 py-3 text-sm font-semibold text-black disabled:opacity-40"
               >
                 {isBuildingSwap
@@ -414,13 +411,22 @@ export default function Home() {
 
             {txHash && (
               <a
-                href={`${BASE_SEPOLIA_EXPLORER}/tx/${txHash}`}
+                href={`${SEPOLIA_EXPLORER}/tx/${txHash}`}
                 target="_blank"
                 rel="noreferrer"
                 className="block text-center text-xs text-emerald-400 hover:underline"
               >
                 View Transaction ↗
               </a>
+            )}
+
+            {isConfirmed && (
+              <button
+                onClick={() => setQuote(null)}
+                className="w-full rounded-lg border border-white/10 py-2 text-xs text-white/60"
+              >
+                Start New Trade
+              </button>
             )}
           </div>
         </aside>
