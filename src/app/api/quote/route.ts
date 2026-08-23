@@ -20,8 +20,21 @@ export async function POST(request: NextRequest) {
         "x-api-key": process.env.UNISWAP_API_KEY,
         "Content-Type": "application/json",
         Accept: "application/json",
+        "x-universal-router-version": "2.2.0",
+        "x-erc20eth-enabled": "false",
+        "x-permit2-disabled": "false",
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        type: "EXACT_INPUT",
+        amount: body.amount,
+        tokenInChainId: body.tokenInChainId,
+        tokenOutChainId: body.tokenOutChainId,
+        tokenIn: body.tokenIn,
+        tokenOut: body.tokenOut,
+        swapper: body.swapper,
+        slippageTolerance: 0.5,
+        protocols: body.protocols, 
+      }),
       cache: "no-store",
     });
 
@@ -30,9 +43,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data, {
       status: response.status,
     });
-  } catch {
+  } catch (error) {
+    console.error("QUOTE ERROR:", error);
+
     return NextResponse.json(
-      { error: "Failed to fetch quote" },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch quote",
+      },
       { status: 500 }
     );
   }
