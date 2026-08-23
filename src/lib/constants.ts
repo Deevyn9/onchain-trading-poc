@@ -7,14 +7,12 @@ export const TOKENS = {
     address: "0x0000000000000000000000000000000000000000",
     decimals: 18,
   },
-
-  USDC: {
-    symbol: "USDC",
-    name: "USD Coin",
-    address: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-    decimals: 6,
+  WETH: {
+    symbol: "WETH",
+    name: "Wrapped Ether",
+    address: "0x4200000000000000000000000000000000000006",
+    decimals: 18,
   },
 } as const;
 
-export const BASE_SEPOLIA_EXPLORER =
-  "https://sepolia-explorer.base.org";
+export const SEPOLIA_EXPLORER = "https://sepolia.basescan.org";
